@@ -1,0 +1,40 @@
+from openpyxl import Workbook
+from random import randrange
+
+# Create a new workbook and get the active sheet
+wb = Workbook()
+ws = wb.active
+range_tuple = (2,22)
+
+ws["A1"] = "Prvni cislo"
+ws["B1"] = "Druhe cislo"
+ws["C1"] = "Nasobeni"
+ws["D1"] = "Deleni:"
+ws["E1"] = 10
+ws["F1"] = "Průměr:"
+
+# Insert values 
+for i in range(*range_tuple):
+    ws[f"A{i}"] = randrange(1,10)
+    ws[f"B{i}"] = randrange(8,100) 
+
+# Insert a formula into C1
+for i in range (*range_tuple):
+    ws[f"C{i}"] = f"=A{i}*B{i}"
+
+for i in range (*range_tuple):
+    ws[f"D{i}"] = f"=C{i}/E1"
+
+for i in range (*range_tuple):
+    ws[f"D{i}"] = f"=C{i}/E1"
+
+ws["G1"] = "=AVERAGE(D2:D21)"
+
+for i in range (*range_tuple):
+    ws[f"F{i}"] = f'=IF(D{i}>G1,"Ano","Ne")'
+
+# Save the workbook to a file
+path = rf"C:\Users\m_ble\Desktop\programování\data k akciím\example.xlsx"
+wb.save(path)
+
+print(f"Excel file saved")
