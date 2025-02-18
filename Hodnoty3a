@@ -1,0 +1,36 @@
+# Load the workbook and format the Date column - takže tady už mám stáhnutý data, už stačí spouštět toto na úpravu WB
+wb = load_workbook(path)
+ws = wb.active
+
+# Apply date format to the Date column
+for cell in ws["A"][1:]:  # Skip header (first row)
+    cell.number_format = "DD/MM/YY"
+# Apply number format to column B (for example)
+ws.insert_rows(1)
+ws.delete_cols(3,5)
+
+ws["C1"] = "Aktualni:"
+ws["C2"] = "# akcií"
+ws["D1"] = last_value_b = ws[f"B{ws.max_row}"].value
+ws["D2"] = "Rozdíl"
+ws["E1"] = "Investice:"
+ws["F1"] = 100
+ws["E2"] = "P/L"
+
+for i in range (3,ws.max_row+1):
+    ws[f"C{i}"] = f"=F1/B{i}"
+for i in range (3,ws.max_row+1):
+    ws[f"D{i}"] = f"=D1-B{i}"
+for i in range (3,ws.max_row+1):
+    ws[f"E{i}"] = f"=D{i}*C{i}"
+
+#ws["G1"] = "=AVERAGE(D2:D21)"
+
+
+for col in ["B","C", "D", "E"]:
+    for cell in ws[col]:
+        cell.number_format = "0.00"
+
+# Save the formatted file
+wb.save(path)
+print("Done")
