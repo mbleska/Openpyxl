@@ -1,0 +1,44 @@
+#funkční, stáhne data, odstraní sloupce co nepotřebuju, dodá jméno Date, naformátuje date
+
+import pandas as pd
+import yfinance as yf
+from openpyxl import load_workbook
+
+
+
+# Get the stock ticker from the user
+ticker = input("Enter the stock ticker: ")
+
+# Download historical data
+data = yf.download(ticker, start="2020-01-01", end="2025-02-14", interval = "1mo")
+
+# Remove the second and third rows
+data = data.iloc[2:].reset_index()
+
+# Rename the first column to 'Date'
+data.rename(columns={data.columns[0]: 'Date'}, inplace=True)
+data.rename(columns={data.columns[1]: 'AdjClose'}, inplace=True)
+# Flatten MultiIndex columns (if any)
+data.columns = [' '.join(col).strip() if isinstance(col, tuple) else col for col in data.columns]
+
+
+# Save the data
+path = rf"C:\Users\m_ble\Desktop\programování\data k akciím\{ticker}.xlsx"
+data.to_excel(path, index=False, engine="openpyxl")
+
+# Load the workbook and format the Date column - takže tady už mám stáhnutý data, už stačí spouštět toto na úpravu WB
+wb = load_workbook(path)
+ws = wb.active
+
+# Apply date format to the Date column
+for cell in ws["A"][1:]:  # Skip header (first row)
+    cell.number_format = "DD/MM/YY"
+# Apply number format to column B (for example)
+for cell in ws["B"]:  
+    cell.number_format = "0.00"  # Two decimal places
+ws.insert_rows(1)
+ws.delete_cols(3,5)
+
+# Save the formatted file
+wb.save(path)
+print("Done")
