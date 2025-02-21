@@ -1,0 +1,49 @@
+#vytvoří range listů v excelu, autovyplní každej podle range ve fci "vypln" + spočítá průměr, vytvoří sheet "result" kam nahraje průměry
+from openpyxl import Workbook
+import random
+import string 
+# Create a new Excel workbook
+wb = Workbook()
+wb.remove(wb.active)
+#sheets = ["A", "B", "C"]
+#vytvoří range(x) písmen (budoucí jména listů, abych tady nemusel vypisovat A, B, C...
+sheets = [string.ascii_uppercase[i] for i in range(20)]
+ws_dict = {}#-je toto potřeba?
+
+
+#vytvoří listy v excelu a dá jim jméno podle seznamu v "sheets" nahoře 
+for sheet in sheets:
+    ws_dict[sheet] = wb.create_sheet(title = sheet)
+
+#definuje fci na vyplnění listu
+def vypln(ws):
+    ws["A1"] = "Date"
+    ws["B1"] = "Close"
+    ws["C1"] = "Random"
+    
+    for i in range(1,101):
+        ws[f"A{i+1}"] = i
+        ws[f"B{i+1}"] = random.randrange(1,100)
+        ws[f"C{i+1}"] = random.randrange(1,3)
+    #vložení pod poslední řádek tabulky
+
+    posledni_radek = ws.max_row
+    ws[f"A{i+2}"] = "Průměr"
+    ws[f"B{i+2}"] = f"=AVERAGE(B2:B{posledni_radek})"
+
+for sheet in sheets:
+    vypln(ws_dict[sheet])
+
+ws_results = wb.create_sheet(title = "Results")
+ws_results["A1"] = "List"
+ws_results["B1"] = "Průměr"
+last_row = ws_dict[sheet].max_row
+for index, sheet in enumerate(sheets, start=1):  
+    ws_results[f"A{index+1}"] = f"{sheet}"  # Sheet name
+    ws_results[f"B{index+1}"] = f"='{sheet}'!B{last_row}"  # Reference to last row in column B in each sheet
+
+# Save the workbook
+file_path = r"C:\Users\m_ble\Desktop\programování\data k akciím\uceni.xlsx"
+wb.save(file_path)
+
+print(f"adj file saved")
